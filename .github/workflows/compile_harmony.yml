@@ -20,11 +20,6 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: 安装鸿蒙SDK
-        uses: ohos-actions/setup-ohos@v1
-        with:
-          api-version: 12
-
       - name: 安装鸿蒙适配版Flutter
         run: |
           git clone https://gitee.com/openharmony-sig/flutter_flutter.git
