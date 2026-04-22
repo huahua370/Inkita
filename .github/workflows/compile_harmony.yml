@@ -8,9 +8,11 @@ on:
 jobs:
   build-harmony:
     runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     steps:
       - name: 拉取代码
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
 
       - name: 安装 Java
         uses: actions/setup-java@v4
@@ -18,29 +20,30 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: 安装鸿蒙适配版 Flutter
+      - name: 安装鸿蒙SDK
+        uses: ohos-actions/setup-ohos@v1
+        with:
+          api-version: 12
+
+      - name: 安装鸿蒙适配版Flutter
         run: |
           git clone https://gitee.com/openharmony-sig/flutter_flutter.git
           echo "$GITHUB_WORKSPACE/flutter_flutter/bin" >> $GITHUB_PATH
 
-      - name: 配置 OHOS SDK
-        run: |
-          flutter config --enable-ohos
+      - name: 启用鸿蒙支持
+        run: flutter config --enable-ohos
 
       - name: 生成鸿蒙目录
-        run: |
-          flutter create --platforms=ohos .
+        run: flutter create --platforms=ohos .
 
       - name: 获取依赖
-        run: |
-          flutter pub get
+        run: flutter pub get
 
-      - name: 编译鸿蒙 HAP 安装包
-        run: |
-          flutter build hap --release
+      - name: 编译鸿蒙HAP安装包
+        run: flutter build hap --release
 
       - name: 上传编译好的鸿蒙APP
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v4.4.3
         with:
           name: inkita-harmony-app
           path: ohos/build/outputs/default/*.hap
