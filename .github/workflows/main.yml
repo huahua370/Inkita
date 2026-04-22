@@ -1,0 +1,29 @@
+name: Build Flutter for OpenHarmony
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      # 下面是关键：编译鸿蒙版本
+      - name: Build for OpenHarmony
+        run: |
+          flutter build ohos --release
+
+      - name: Upload .hap
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-hap
+          path: build/ohos/release/
