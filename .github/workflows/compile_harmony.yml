@@ -1,0 +1,46 @@
+name: 编译 Flutter 为鸿蒙 APP
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build-harmony:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 拉取代码
+        uses: actions/checkout@v4
+
+      - name: 安装 Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: 安装鸿蒙适配版 Flutter
+        run: |
+          git clone https://gitee.com/openharmony-sig/flutter_flutter.git
+          echo "$GITHUB_WORKSPACE/flutter_flutter/bin" >> $GITHUB_PATH
+
+      - name: 配置 OHOS SDK
+        run: |
+          flutter config --enable-ohos
+
+      - name: 生成鸿蒙目录
+        run: |
+          flutter create --platforms=ohos .
+
+      - name: 获取依赖
+        run: |
+          flutter pub get
+
+      - name: 编译鸿蒙 HAP 安装包
+        run: |
+          flutter build hap --release
+
+      - name: 上传编译好的鸿蒙APP
+        uses: actions/upload-artifact@v4
+        with:
+          name: inkita-harmony-app
+          path: ohos/build/outputs/default/*.hap
